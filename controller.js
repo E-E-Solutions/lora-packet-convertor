@@ -10,8 +10,8 @@ function extractByts(hexValue, startBit, endBit) {
 // send data
 const sendData = (req, res) => {
   const body = req.body;
-  const auth = req.headers.authorization;
-
+  const authHeader = req.headers.authorization;
+  checkForAuth(authHeader);
   const {
     srNo,
     applicationId,
@@ -35,5 +35,24 @@ const sendData = (req, res) => {
 
   res.status(StatusCodes.OK).json({ voltage, time, totlozer });
 };
-
 module.exports = { sendData };
+
+// function for check auth
+function checkForAuth(authHeader) {
+  if (authHeader) {
+    const encodedCredentials = authHeader.split(" ")[1];
+    const decodedCredentials = Buffer.from(
+      encodedCredentials,
+      "base64"
+    ).toString("utf-8");
+    const [username, password] = decodedCredentials.split(":");
+
+    if (username === "testUser@ene" && password === "secret") {
+      next();
+    } else {
+      res.status(401).send("Unauthorized");
+    }
+  } else {
+    res.status(401).send("Unauthorized");
+  }
+}
