@@ -1,17 +1,30 @@
 const { StatusCodes } = require("http-status-codes");
-
+const { checkForAuth } = require("./authorizatoin");
 // Function to extract specific bits from a hexadecimal value
-function extractByts(hexValue, startBit, endBit) {
-  const bytes = hexValue.substring(startBit, endBit); // Bytes 6 to 7
-  const value = parseInt(bytes, 16);
-  return value;
+// hex to decimal
+function hexToDecimal(hex) {
+  return parseInt(hex, 16);
+}
+
+// parse
+function parseHexadecimalString(hexString) {
+  const otherInfo = hexString.slice(0, 8);
+  const voltageValue = hexToDecimal(hexString.slice(8, 12));
+  const timeValue = hexToDecimal(hexString.slice(12, 16));
+  const totalizerValue = hexToDecimal(hexString.slice(16));
+
+  return {
+    voltageValue,
+    timeValue,
+    totalizerValue,
+  };
 }
 
 // send data
-const sendData = (req, res) => {
+const sendData = (req, res, next) => {
   const body = req.body;
   const authHeader = req.headers.authorization;
-  checkForAuth(authHeader);
+  checkForAuth(res, next, authHeader);
   const {
     srNo,
     applicationId,
@@ -25,34 +38,9 @@ const sendData = (req, res) => {
     res.status(StatusCodes.BAD_GATEWAY).json("Data field is mandatory..");
   }
   let hexValue = data;
-  // here we extract info from the data
-  let voltageFactor = 0.001;
-  let timeFactor = 0.01;
-  let totlozerFactor = 0.001;
-  let voltage = extractByts(hexValue, 6, 7) * voltageFactor;
-  let time = extractByts(hexValue, 8, 9) * timeFactor;
-  let totlozer = extractByts(hexValue, 11, 15) * totlozerFactor;
+  const { voltageValue, timeValue, totalizerValue } =
+    parseHexadecimalString(hexValue);
 
-  res.status(StatusCodes.OK).json({ voltage, time, totlozer });
+  res.status(StatusCodes.OK).json({ voltageValue, timeValue, totalizerValue });
 };
 module.exports = { sendData };
-
-// function for check auth
-function checkForAuth(authHeader) {
-  if (authHeader) {
-    const encodedCredentials = authHeader.split(" ")[1];
-    const decodedCredentials = Buffer.from(
-      encodedCredentials,
-      "base64"
-    ).toString("utf-8");
-    const [username, password] = decodedCredentials.split(":");
-
-    if (username === "testUser@ene" && password === "secret") {
-      next();
-    } else {
-      res.status(401).send("Unauthorized");
-    }
-  } else {
-    res.status(401).send("Unauthorized");
-  }
-}
