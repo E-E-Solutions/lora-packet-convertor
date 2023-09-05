@@ -1,5 +1,6 @@
 const express = require("express");
 require("express-async-errors");
+require("dotenv").config();
 
 const app = express();
 const { sendData } = require("./controller");
@@ -7,7 +8,6 @@ const { sendData } = require("./controller");
 app.use(express.json());
 // post routes
 app.post("/api/v1/send", sendData);
-
 //  port
 const port = 3345;
 

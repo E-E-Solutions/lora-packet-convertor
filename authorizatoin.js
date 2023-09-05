@@ -9,12 +9,12 @@ function checkForAuth(res, next, authHeader) {
     const [username, password] = decodedCredentials.split(":");
 
     if (username === "testUser@ene" && password === "secret") {
-      next();
+      return true;
     } else {
-      res.status(401).send("Unauthorized");
+      return false;
     }
   } else {
-    res.status(401).send("Unauthorized");
+    return false;
   }
 }
 module.exports = { checkForAuth };
