@@ -8,7 +8,10 @@ function checkForAuth(res, next, authHeader) {
     ).toString("utf-8");
     const [username, password] = decodedCredentials.split(":");
 
-    if (username === "testUser@ene" && password === "secret") {
+    if (
+      username === "testUser@enggenv.com" &&
+      password === "2hPj5&qR9yS6@WvT8x#Z4AeGcF7bV1mY0NwL3KdX"
+    ) {
       return true;
     } else {
       return false;

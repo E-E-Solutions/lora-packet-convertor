@@ -1,9 +1,17 @@
 const express = require("express");
+const cors = require("cors");
 require("express-async-errors");
 require("dotenv").config();
 
 const app = express();
 const { sendData } = require("./controller");
+
+const corsOptions = {
+  origin: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  optionsSuccessStatus: 204,
+};
+app.use(cors(corsOptions));
 
 app.use(express.json());
 // post routes
