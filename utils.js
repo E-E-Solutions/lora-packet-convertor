@@ -1,20 +1,36 @@
-function hexToDecimal(hex) {
-  return parseInt(hex, 16);
-}
+const Convertor = (arr) => {
+  const hexValues = arr.map((num) => num.toString(16).padStart(2, "0")); // Added padding
+  const hexString = hexValues.join("");
+  return parseInt(hexString, 16);
+};
 
-// parse
-function parseHexadecimalString(hexString) {
-  console.log(hexString);
-  const otherInfo = hexString.slice(0, 7);
-  const voltageValue = hexToDecimal(hexString.slice(7, 9)) * 0.01;
-  let timeValue = hexToDecimal(hexString.slice(9, 11)) * 0.01;
-  const totalizerValue = hexToDecimal(hexString.slice(11, 16)) * 0.001;
+const timeConvertor = (time) => {
+  const hexValues = time.map((num) => num.toString(16).padStart(2, "0"));
+  return hexValues.join(":");
+};
 
-  return {
-    voltageValue,
-    timeValue,
-    totalizerValue,
-  };
-}
+const parseHexadecimalString = (encodedString) => {
+  const decodedBuffer = Buffer.from(encodedString, "base64");
+  const totalizerBytes = Array.from(
+    { length: 5 },
+    (_, index) => decodedBuffer[11 + index]
+  );
 
-module.exports = { hexToDecimal, parseHexadecimalString };
+  const forwardTotalizer = (totalizerBytes.join("") * 0.00001).toFixed(5);
+  const voltage = Array.from(
+    { length: 2 },
+    (_, index) => decodedBuffer[6 + index]
+  );
+  const BatteryVoltage = (Convertor(voltage) * 0.001).toFixed(5);
+  const time = Array.from(
+    { length: 2 },
+    (_, index) => decodedBuffer[8 + index]
+  );
+
+  const supplyTime = timeConvertor(time);
+  console.log({ supplyTime, BatteryVoltage, forwardTotalizer });
+
+  return { supplyTime, BatteryVoltage, forwardTotalizer };
+};
+
+module.exports = { parseHexadecimalString };

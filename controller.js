@@ -1,15 +1,14 @@
 const { StatusCodes } = require("http-status-codes");
 const { checkForAuth } = require("./authorizatoin");
 const { parseHexadecimalString } = require("./utils");
-const Device = require("./sqlQuery");
-const db = require("./database");
 const axios = require("axios");
 
 // send data
 const sendData = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    const webhookUrl = "http://localhost:5100/loraData/webhookAdded";
+    const webhookUrl =
+      "https://data-reciever.onrender.com/loraData/webhookAdded";
 
     if (!checkForAuth(res, next, authHeader)) {
       return res.status(StatusCodes.UNAUTHORIZED).json("Unauthorized");
@@ -23,31 +22,11 @@ const sendData = async (req, res, next) => {
         .json("Data field is mandatory.");
     }
 
-    const { voltageValue, timeValue, totalizerValue } =
+    const { supplyTime, BatteryVoltage, forwardTotalizer } =
       parseHexadecimalString(data);
-    const deviceAlreadyPresent = await Device.findWithDeciceId(deviceui);
-
-    if (!deviceAlreadyPresent[0][0]) {
-      console.log("new device added", deviceAlreadyPresent);
-      let device = new Device(
-        null,
-        deviceui,
-        deviceName,
-        voltageValue,
-        +timeValue,
-        totalizerValue
-      );
-      await device.save();
-    } else {
-      console.log("device is updating.");
-      await Device.updateById(
-        voltageValue,
-        timeValue,
-        totalizerValue,
-        deviceui
-      );
-    }
-
+    req.body.supplyTime = supplyTime;
+    req.body.BatteryVoltage = BatteryVoltage;
+    req.body.forwardTotalizer = forwardTotalizer;
     // Webhooks...............
     await axios.post(
       webhookUrl,

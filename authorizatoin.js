@@ -9,8 +9,8 @@ function checkForAuth(res, next, authHeader) {
     const [username, password] = decodedCredentials.split(":");
 
     if (
-      username === "testUser@enggenv.com" &&
-      password === "2hPj5&qR9yS6@WvT8x#Z4AeGcF7bV1mY0NwL3KdX"
+      username === process.env.LORA_USER &&
+      password === process.env.LORA_PASSWORD
     ) {
       return true;
     } else {

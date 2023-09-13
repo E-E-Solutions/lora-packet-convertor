@@ -15,7 +15,10 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 // post routes
-app.post("/api/v1/send", sendData);
+app.get("/api/v1/lora", (req, res) => {
+  res.json("get request successfully. ");
+});
+app.post("/api/v1/lora", sendData);
 //  port
 const port = 3345;
 
