@@ -18,7 +18,7 @@ app.use(express.json());
 app.get("/api/v1/lora", (req, res) => {
   res.json("get request successfully. ");
 });
-app.post("/api/v1/lora", sendData);
+app.post("/ene/api/lora", sendData);
 //  port
 const port = 3345;
 

@@ -4,10 +4,10 @@ const Convertor = (arr) => {
   return parseInt(hexString, 16);
 };
 
-const timeConvertor = (time) => {
-  const hexValues = time.map((num) => num.toString(16).padStart(2, "0"));
-  return hexValues.join(":");
-};
+// const timeConvertor = (time) => {
+//   const hexValues = time.map((num) => num.toString(16).padStart(2, "0"));
+//   return hexValues.join(":");
+// };
 
 const parseHexadecimalString = (encodedString) => {
   const decodedBuffer = Buffer.from(encodedString, "base64");
@@ -17,20 +17,20 @@ const parseHexadecimalString = (encodedString) => {
   );
 
   const forwardTotalizer = (totalizerBytes.join("") * 0.00001).toFixed(5);
-  const voltage = Array.from(
-    { length: 2 },
-    (_, index) => decodedBuffer[6 + index]
-  );
-  const BatteryVoltage = (Convertor(voltage) * 0.001).toFixed(5);
-  const time = Array.from(
-    { length: 2 },
-    (_, index) => decodedBuffer[8 + index]
-  );
 
-  const supplyTime = timeConvertor(time);
-  console.log({ supplyTime, BatteryVoltage, forwardTotalizer });
+  // Battary voltage ..............
+  const decodedVolt = (decodedBuffer[6] << 8) | decodedBuffer[7];
+  const BatteryVoltage = (decodedVolt * 0.001).toFixed(3);
+  console.log("Battery : ", BatteryVoltage);
+  // const time = Array.from(
+  //   { length: 2 },
+  //   (_, index) => decodedBuffer[8 + index]
+  // );
 
-  return { supplyTime, BatteryVoltage, forwardTotalizer };
+  // const supplyTime = timeConvertor(time);
+  console.log({ BatteryVoltage, forwardTotalizer });
+
+  return { BatteryVoltage, forwardTotalizer };
 };
 
 module.exports = { parseHexadecimalString };
