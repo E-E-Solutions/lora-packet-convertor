@@ -1,36 +1,56 @@
-const Convertor = (arr) => {
-  const hexValues = arr.map((num) => num.toString(16).padStart(2, "0")); // Added padding
-  const hexString = hexValues.join("");
-  return parseInt(hexString, 16);
-};
-
-// const timeConvertor = (time) => {
-//   const hexValues = time.map((num) => num.toString(16).padStart(2, "0"));
-//   return hexValues.join(":");
-// };
-
+const base64 = require("base64-js");
 const parseHexadecimalString = (encodedString) => {
-  const decodedBuffer = Buffer.from(encodedString, "base64");
-  const totalizerBytes = Array.from(
-    { length: 5 },
-    (_, index) => decodedBuffer[11 + index]
-  );
 
-  const forwardTotalizer = (totalizerBytes.join("") * 0.00001).toFixed(5);
+  const bytesData = base64.toByteArray(encodedString);
 
-  // Battary voltage ..............
-  const decodedVolt = (decodedBuffer[6] << 8) | decodedBuffer[7];
-  const BatteryVoltage = (decodedVolt * 0.001).toFixed(3);
-  console.log("Battery : ", BatteryVoltage);
-  // const time = Array.from(
-  //   { length: 2 },
-  //   (_, index) => decodedBuffer[8 + index]
-  // );
+  const hexString = Buffer.from(bytesData).toString("hex");
 
-  // const supplyTime = timeConvertor(time);
-  console.log({ BatteryVoltage, forwardTotalizer });
+  console.log(hexString, "hex_stringhex_stringhex_stringhex_string");
+  const byt1011 = hexString[10] + hexString[11];
 
-  return { BatteryVoltage, forwardTotalizer };
+  const byt1213 = hexString[12] + hexString[13];
+
+  const byt1415 = hexString[14] + hexString[15];
+
+  const byt1617 = hexString[16] + hexString[17];
+
+  const byt1819 = hexString[18] + hexString[19];
+
+  const readingByt = byt1819 + byt1617 + byt1415 + byt1213;
+
+  let forwardTotalizer;
+  if (byt1011 === "2b") {
+    const readingg = parseInt(readingByt) * 0.001;
+    forwardTotalizer = Math.floor(readingg * 100) / 100;
+  } else if (byt1011 === "2c") {
+    const readingg = parseInt(readingByt) * 0.01;
+    forwardTotalizer = Math.floor(readingg * 100) / 100;
+  } else if (byt1011 === "2d") {
+    const readingg = parseInt(readingByt) * 0.1;
+    forwardTotalizer = Math.floor(readingg * 100) / 100;
+  } else if (byt1011 === "2e") {
+    const readingg = parseInt(readingByt) * 1;
+    forwardTotalizer = Math.floor(readingg * 100) / 100;
+  } else {
+    forwardTotalizer = "Invalid Byte";
+    rp_status = "Invalid Byte";
+    d_reading = 0;
+  }
+
+  let BateryVoltage = hexString[24] + hexString[25];
+  BateryVoltage = Math.floor((parseInt(BateryVoltage, 16) / 253) * 100);
+  if (BateryVoltage > 100) {
+    BateryVoltage = 100;
+  }
+  console.log({ BateryVoltage, forwardTotalizer });
+  return { BateryVoltage, forwardTotalizer };
 };
+
+const parseHexDecimalStrForBelow50mm = (encodedString)=>{
+  const bytesData = base64.toByteArray(encodedString);
+  const hexString = Buffer.from(bytesData).toString("hex");
+  console.log(hexString, "hex_stringhex_stringhex_stringhex_string");
+  const forwardTotalizer = 
+}
 
 module.exports = { parseHexadecimalString };

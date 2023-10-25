@@ -1,7 +1,9 @@
-{
-  "timestamp": "2023-10-18T07-26-49.766Z",
-  "id": "GFM31014892",
-  "totalizer": "0.00254",
-  "battery_voltage": "34.610",
-  "data": "gQqQH9MthzIUAAAA/g=="
-},
+[
+  {
+    "timestamp": "2023-10-19T09:52:57.566Z",
+    "id": "GFM31014892",
+    "totalizer": 14328.7,
+    "battery_voltage": "100",
+    "data": "gQqQH9MthzIUAAAA/g=="
+  }
+]

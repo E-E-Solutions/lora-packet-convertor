@@ -2,16 +2,20 @@ const { StatusCodes } = require("http-status-codes");
 const { checkForAuth } = require("./authorizatoin");
 const { parseHexadecimalString } = require("./utils");
 const fs = require("fs");
-const path = require("path");
 const http = require("http");
 
 const saveDataToFile = (data) => {
   const filename = "LoraData.json";
-  const timestamp = new Date().toISOString();
+  const timestamp = new Date().toLocaleString(); 
+  let existingData = [];
+  try {
+    const existingDataJSON = fs.readFileSync(filename, "utf8");
+    existingData = JSON.parse(existingDataJSON);
+  } catch (err) {}
   const newData = { timestamp, ...data };
-  const newDataJSON = JSON.stringify(newData, null, 2);
-  const appendedData = `${newDataJSON},`;
-  fs.appendFileSync(filename, appendedData, "utf8");
+  existingData.push(newData);
+  const updatedDataJSON = JSON.stringify(existingData, null, 2);
+  fs.writeFileSync(filename, updatedDataJSON, "utf8");
 };
 
 const sendData = async (req, res, next) => {
@@ -26,14 +30,13 @@ const sendData = async (req, res, next) => {
         .status(StatusCodes.BAD_GATEWAY)
         .json("Data field is mandatory.");
 
-    const { BatteryVoltage, forwardTotalizer } = parseHexadecimalString(data);
+    const { BateryVoltage, forwardTotalizer } = parseHexadecimalString(data);
     const id = "GFM" + deviceName;
     const totalizer = forwardTotalizer;
-    const battery_voltage = BatteryVoltage;
+    const battery_voltage = `${BateryVoltage}`;
+
     // ......save data to file
-    const now = new Date();
-    const timestamp = now.toISOString().replace(/:/g, "-");
-    saveDataToFile({ id, totalizer, battery_voltage, data, timestamp });
+    saveDataToFile({ id, totalizer, battery_voltage, data });
 
     const postData = JSON.stringify({ totalizer, battery_voltage, id });
 
